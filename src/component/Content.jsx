@@ -5,7 +5,6 @@ import { useNavigate } from 'react-router';
 import { useDispatch, useSelector } from 'react-redux';
 import { getDomains, deleteDomain, editDomain } from '../redux/DomainsReducer';
 import swal from 'sweetalert';
-import { TableLoading } from './Loading';
 
 
 const Content = () => {
@@ -85,31 +84,30 @@ const Content = () => {
 
 
     return (
-        <>
-        {
-            mainDomains.length ? (
-                <div className='max-w-[1000px] w-full h-full flex flex-col items-center justify-start gap-8 py-24 px-12'>
-                    <h1 className='self-start text-3xl font-normal'>Domains</h1>
-                    <div className='max-w-full w-full flex flex-col-reverse gap-4 md:flex-row items-center justify-between'>
-                        <button className='w-full md:w-auto bg-blue-500 rounded-sm text-lg py-2 px-4 text-white' onClick={() => {
-                            setDrawerIsOpen(true)
-                            navigate(`/add`)
-                            }}><i className="ri-add-line"></i> Add Domain</button>
-                        <div className='w-full md:w-auto flex flex-col md:flex-row items-center gap-5'>
-                            <div className='w-full'>
-                                <select className='w-full focus:outline-none py-2 px-4 border border-gray-400 rounded-sm' name="filter" id="filter" onChange={filterDomainsByStatus}>
-                                    <option value="">Order by Ascending</option>
-                                    <option value="pending">pending</option>
-                                    <option value="verified">verified</option>
-                                    <option value="rejected">rejected</option>
-                                </select>
-                            </div>
-                            <div className='w-full py-2 px-4 flex items-center gap-2 border border-gray-400 rounded-sm'>
-                                <i className="ri-search-line text-gray-400"></i>
-                                <input className='focus:outline-none' type="search" placeholder='Search' onChange={(e) => filterDomainsBySearch(e)}/>
-                            </div>
-                        </div>
+        <div className='max-w-[1000px] w-full h-full flex flex-col items-center justify-start gap-8 py-24 px-12'>
+            <h1 className='self-start text-3xl font-normal'>Domains</h1>
+            <div className='max-w-full w-full flex flex-col-reverse gap-4 md:flex-row items-center justify-between'>
+                <button className='w-full md:w-auto bg-blue-500 rounded-sm text-lg py-2 px-4 text-white' onClick={() => {
+                    setDrawerIsOpen(true)
+                    navigate(`/add`)
+                    }}><i className="ri-add-line"></i> Add Domain</button>
+                <div className='w-full md:w-auto flex flex-col md:flex-row items-center gap-5'>
+                    <div className='w-full'>
+                        <select className='w-full focus:outline-none py-2 px-4 border border-gray-400 rounded-sm' name="filter" id="filter" onChange={filterDomainsByStatus}>
+                            <option value="">Order by Ascending</option>
+                            <option value="pending">pending</option>
+                            <option value="verified">verified</option>
+                            <option value="rejected">rejected</option>
+                        </select>
                     </div>
+                    <div className='w-full py-2 px-4 flex items-center gap-2 border border-gray-400 rounded-sm'>
+                        <i className="ri-search-line text-gray-400"></i>
+                        <input className='focus:outline-none' type="search" placeholder='Search' onChange={(e) => filterDomainsBySearch(e)}/>
+                    </div>
+                </div>
+            </div>
+            {
+                mainDomains.length ? (
                     <table className='max-w-full w-full shadow-lg rounded-sm'>
                         <thead>
                             <tr className='border-b border-gray-200 text-gray-500 rounded-sm'>
@@ -133,7 +131,7 @@ const Content = () => {
                                                     )
                                                 }
                                             </span>
-                                            <span className='max-w-32 sm:max-w-44 md:max-w-96 overflow-hidden text-nowrap text-ellipsis'>{i.domain}</span>
+                                            <span className='max-w-20 sm:max-w-44 md:max-w-96 overflow-hidden text-nowrap text-ellipsis'>{i.domain}</span>
                                             <button onClick={() => {
                                                 setDrawerIsOpen(true)
                                                 navigate(`/edit/${i.id}`)
@@ -156,11 +154,18 @@ const Content = () => {
                             }
                         </tbody>
                     </table>
-                </div>
-            ) : (
-                TableLoading()
-            )
-        }</>
+
+                ) : (
+                    <div className="animate-pulse w-full flex items-center flex-col gap-4">
+                        <div className="w-96 md:w-[650px] lg:w-[900px] h-2 rounded-md bg-slate-400 self-start"></div>
+                        <div className="w-96 md:w-[650px] lg:w-[900px] h-2 rounded-md bg-slate-400 self-start"></div>
+                        <div className="w-96 md:w-[650px] lg:w-[900px] h-2 rounded-md bg-slate-400 self-start"></div>
+                        <div className="w-96 md:w-[650px] lg:w-[900px] h-2 rounded-md bg-slate-400 self-start"></div>
+                        <div className="w-96 md:w-[650px] lg:w-[900px] h-2 rounded-md bg-slate-400 self-start"></div>
+                    </div>
+                ) 
+            }
+        </div>
     );
 }
 
