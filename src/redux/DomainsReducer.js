@@ -1,28 +1,45 @@
-import { createSlice } from "@reduxjs/toolkit"
+import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
 
-const domainsSlice = createSlice({
-    name: 'domain',
-    initialState: {
-        domainsList: []
-    },
-    reducers: {
-        getDomains : (state, action) => {
-            state.domainsList = action.payload;
-        },
-        addDomain : (state, action) => {
-            state.domainsList.push(action.payload);
-        },
-        editDomain : (state, action) => {
-            const item = state.domainsList.findIndex(i => i.id == action.payload.id);
-            state.domainsList[item] = action.payload;
-        },
-        deleteDomain : (state, action) => {
-            const id = action.payload;
-            state.domainsList = state.domainsList.filter(i => i.id != id);
-        }
-    }
+export const domainApi = createApi({
+    reducerPath: 'domainApi',
+    baseQuery: fetchBaseQuery({baseUrl: 'https://6797aa2bc2c861de0c6d964c.mockapi.io/domain'}),
+    tagTypes: ['Domains'],
+    endpoints: (builder) => ({
+        getAllDomains : builder.query({
+            query: () => ({
+                method: 'GET'
+                
+            }),providesTags: ['Domains']
+        }),
+        getDomain : builder.mutation({
+            query: ({id}) => ({
+                url: `/${id}`,
+                method: 'GET',
+            }),invalidatesTags: ['Domains']
+        }),
+        updateDomain : builder.mutation({
+            query: ({data}) => ({
+                url: `/${data.id}`,
+                method: 'PUT',
+                body: data
+            }),invalidatesTags: ['Domains']
+        }),
+        addDomain : builder.mutation({
+            query: ({data}) => ({
+                method: 'POST',
+                body: data
+            }),invalidatesTags: ['Domains']
+        }),
+        deleteDomain : builder.mutation({
+            query: ({id}) => ({
+                url: `/${id}`,
+                method: 'DELETE'
+            }),invalidatesTags: ['Domains']
+        })
+    })
 })
 
-export default domainsSlice.reducer;
-export const {getDomains, addDomain, editDomain, deleteDomain} = domainsSlice.actions;
+
+
+export const {useGetAllDomainsQuery, useGetDomainMutation, useAddDomainMutation, useUpdateDomainMutation, useDeleteDomainMutation} = domainApi;

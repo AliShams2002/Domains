@@ -1,11 +1,13 @@
 import { configureStore } from "@reduxjs/toolkit";
-import domainsSlice from "../DomainsReducer";
+import { domainApi } from "../DomainsReducer";
 
 
-const store = configureStore({
+export const store = configureStore({
     reducer: {
-        domains: domainsSlice
-    }
-})
+      [domainApi.reducerPath]: domainApi.reducer,
+    },
+    middleware: (getDefaultMiddleware) =>
+      getDefaultMiddleware().concat(domainApi.middleware),
+  })
 
-export default store;
+export type AppDispatch = typeof store.dispatch;

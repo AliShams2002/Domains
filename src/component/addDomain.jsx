@@ -1,11 +1,10 @@
-import axios from 'axios';
 import React, { useContext, useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { addDomain } from '../redux/DomainsReducer';
 import { useFormik } from 'formik';
 import { useNavigate } from 'react-router';
 import { MainContext } from '../context/MainContext';
 import swal from 'sweetalert';
+import { useAddDomainMutation } from '../redux/DomainsReducer';
 
 const AddDomain = () => {
 
@@ -14,9 +13,9 @@ const AddDomain = () => {
             domainName: ''
         }, 
         onSubmit: (values, submitProps) => {
-            domainValues.domain = values.domainName;
+            domainData.domain = values.domainName;
             setTimeout(() => {
-                postDomains();
+                handelPostDomains();
                 submitProps.setSubmitting(false);
             }, 3000);
         },
@@ -32,7 +31,8 @@ const AddDomain = () => {
         }
     })
 
-    const [domainValues, setDomainValues] = useState({
+    const [postDomain] = useAddDomainMutation();
+    const [domainData, setDomainData] = useState({
         id: '',
         "createdDate": new Date().getTime(),
         "domain": "",
@@ -43,16 +43,16 @@ const AddDomain = () => {
     const navigate = useNavigate();
     const {drawerIsOpen, setDrawerIsOpen} = useContext(MainContext);
 
-    const postDomains = () => {
-        axios.post('https://6797aa2bc2c861de0c6d964c.mockapi.io/domain', domainValues).then(res => {
-            domainValues.id = res.data.id;
-            dispatch(addDomain(res.data))
-            if(res.status == 200 || 201) {
-                swal("Add successful!", "Domain added successfully.", "success");
-            } else {
-                swal("Add failed!", "Adding domain failed..", "error");
-            }
-        })
+
+
+    const handelPostDomains = async () => {
+        try {
+            const data = await postDomain({data: domainData});
+            domainData.id = data.data.id;
+            swal("Add successful!", "Domain added successfully.", "success");
+          } catch (error) {
+            swal("Add failed!", "Adding domain failed..", "error");
+          }
     }
 
     return (

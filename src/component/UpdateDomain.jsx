@@ -1,8 +1,6 @@
-import axios from 'axios';
 import React, { useContext, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router';
-import { editDomain } from '../redux/DomainsReducer';
-import { useDispatch } from 'react-redux';
+import { useGetDomainMutation, useUpdateDomainMutation } from '../redux/DomainsReducer';
 import { useFormik } from 'formik';
 import { MainContext } from '../context/MainContext';
 import swal from 'sweetalert';
@@ -11,57 +9,53 @@ import swal from 'sweetalert';
 const UpdateDomain = () => {
 
     const formik = useFormik({
-            initialValues: {
-                domainName: ''
-            }, 
-            onSubmit: (values, submitProps) => {
-                domainValues.domain = values.domainName;
-                setTimeout(() => {
-                    updateDomain();
-                    submitProps.setSubmitting(false);
-                }, 3000);
-            },
-            validate: values => {
-                const error = {};
-                if(!values.domainName) {
-                    error.domainName = 'Please enter the domain name!'
-                } else if(!/^(http(s):\/\/.)[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)$/.test(values.domainName)){
-                    error.domainName = 'Please enter the domain name correctly. EX: https://www.google.com'
-                }
-    
-                return error;
+        initialValues: {
+            domainName: ''
+        }, 
+        onSubmit: (values, submitProps) => {
+            domainValues.domain = values.domainName;
+            setTimeout(() => {
+                updateDomain();
+                submitProps.setSubmitting(false);
+            }, 3000);
+        },
+        validate: values => {
+            const error = {};
+            if(!values.domainName) {
+                error.domainName = 'Please enter the domain name!'
+            } else if(!/^(http(s):\/\/.)[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)$/.test(values.domainName)){
+                error.domainName = 'Please enter the domain name correctly. EX: https://www.google.com'
             }
-        })
 
+            return error;
+        }
+    })
+
+    const [getDomain] = useGetDomainMutation();
+    const [updatDomainValue] = useUpdateDomainMutation();
     const [domainValues, setDomainValues] = useState(null);
     const {drawerIsOpen, setDrawerIsOpen} = useContext(MainContext);
-    const dispatch = useDispatch();
     const navigate = useNavigate();
     const {id} = useParams();
 
 
-
-
-    const getDomainValue = () => {
-        axios.get(`https://6797aa2bc2c861de0c6d964c.mockapi.io/domain/${id}`).then(res => {
-            formik.values.domainName = res.data.domain;
-            setDomainValues(res.data);
-        })
+    const handelGetDomainValue = async () => {
+        const data = await getDomain({id});
+        setDomainValues(data.data);
+        formik.values.domainName = data.data.domain;
     }
 
     const updateDomain = () => {
-        axios.put(`https://6797aa2bc2c861de0c6d964c.mockapi.io/domain/${id}`, domainValues).then(res => {
-            dispatch(editDomain(domainValues));
-            if(res.status == 200 || 201) {
-                swal("Update successful!", "Domain update successfully.", "success");
-            } else {
-                swal("Update failed!", "Domain update failed..", "error");
-            }
-        })
+        try {
+            updatDomainValue({data: domainValues});
+            swal("Update successful!", "Domain update successfully.", "success");
+        } catch (error) {
+            swal("Update failed!", "Domain update failed..", error);
+        }
     }
 
     useEffect(() => {
-        getDomainValue();
+        handelGetDomainValue();
     }, [])
 
 
